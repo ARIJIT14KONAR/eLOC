@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get eLOC from Address and Pincode</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #input-section {
+            margin-bottom: 20px;
+        }
+        label, input, button {
+            display: block;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: green;
+        }
+        #error {
+            margin-top: 20px;
+            font-size: 18px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Get eLOC from Address and Pincode</h1>
+    <div id="input-section">
+        <label for="address">Enter Address:</label>
+        <input type="text" id="address" placeholder="Enter address here">
+
+        <label for="pincode">Enter Pincode:</label>
+        <input type="text" id="pincode" placeholder="Enter pincode here">
+
+        <button onclick="getELoc()">Get eLOC</button>
+    </div>
+
+    <div id="result"></div>
+    <div id="error"></div>
+
+    <script>
+        // Function to merge address and pincode, and get eLOC from MapmyIndia
+        async function getELoc() {
+            var address = document.getElementById('address').value.trim();
+            var pincode = document.getElementById('pincode').value.trim();
+
+            // Check if both address and pincode are entered
+            if (address === "" || pincode === "") {
+                document.getElementById('error').innerHTML = "Please enter both address and pincode.";
+                return;
+            }
+
+            // Merge address and pincode into one query string
+            ///var fullAddress = address + " " + pincode;
+            document.getElementById('error').innerHTML = "";  // Clear error
+
+            // MapmyIndia API Key (replace with your actual key)
+            var apiKey = "28ccdca31554dba6eda5cd39d02c53e1";
+
+            // Geocode API URL with merged address and pincode
+            var url = "http://localhost:3000/get-eloc?address=" + encodeURIComponent(address);
+
+
+            try {
+                // Fetch the eLOC from MapmyIndia API
+                let response = await fetch(url);
+                let data = await response.json();
+
+                if (data && data.copResults && data.copResults.length > 0) {
+                    // Get the first result's eLOC
+                    var eloc = data.copResults[0].eLoc;
+                    document.getElementById('result').innerHTML = "eLOC: " + eloc;
+                } else {
+                    document.getElementById('error').innerHTML = "No eLOC found for the given address and pincode.";
+                }
+            } catch (error) {
+                document.getElementById('error').innerHTML = "Error fetching eLOC from MapmyIndia API.";
+            }
+        }
+    </script>
+</body>
+</html>
